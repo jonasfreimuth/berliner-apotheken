@@ -29,3 +29,32 @@ ggsave(
   plot = counts_by_time_plot, filename = "counts_by_time.pdf",
   width = 9
 )
+
+period_change <- district_counts %>%
+  arrange(year) %>%
+  group_by(district) %>%
+  summarize(
+    relative_change = (last(count) / first(count)) - 1,
+    absolute_change = last(count) - first(count)
+  )
+
+period_change_plot <- ggplot(
+  period_change,
+  aes(x = district, y = relative_change, fill = relative_change)
+) +
+  geom_col() +
+  scale_fill_viridis_c(option = "rocket") +
+  labs(
+    x = "District",
+    y = "Relative Change"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 50, hjust = 1)
+  )
+
+ggsave(
+  plot = period_change_plot, filename = "change_over_time.pdf",
+  width = 9
+)
