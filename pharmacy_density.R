@@ -1,11 +1,20 @@
 import::from(
-  "dplyr", "arrange", "everything", "first", "group_by", "last", "summarize"
+  "dplyr",
+  "arrange",
+  "everything",
+  "first",
+  "group_by",
+  "last",
+  "left_join",
+  "summarize"
 )
 import::from("ggplot2", .all = TRUE)
 import::from("magrittr", "%>%")
 import::from("purrr", "iwalk")
 import::from("readr", "read_csv")
+import::from("terra", "vect")
 import::from("tidyr", "pivot_longer")
+import::from("tidyterra", "geom_spatvector")
 
 load_district_counts <- function(data_path = "pharmacies-all-clean.csv") {
   read_csv(data_path, show_col_types = FALSE) %>%
@@ -46,6 +55,33 @@ gen_period_change_plot <- function(period_change) {
     )
 }
 
+download_districts_mapdata <- function(url = "https://tsb-opendata.s3.eu-central-1.amazonaws.com/bezirksgrenzen/bezirksgrenzen.geojson",
+                                       destfile = "bezirksgrenzen.geojson") {
+  download.file(url, destfile)
+}
+
+gen_period_change_map <- function(period_change) {
+  districts_mapdata <- "bezirksgrenzen.geojson"
+
+  if (!file.exists(districts_mapdata)) {
+    download_districts_mapdata(destfile = districts_mapdata)
+  }
+
+  district_map <- vect(districts_mapdata) %>%
+    left_join(period_change, by = c("Gemeinde_name" = "district"))
+
+  ggplot() +
+    geom_spatvector(
+      data = district_map,
+      aes(fill = relative_change)
+    ) +
+    scale_fill_viridis_c(option = "rocket") +
+    labs(
+      fill = "Relative Change"
+    ) +
+    theme_minimal()
+}
+
 generate_plots <- function(data_path = "pharmacies-all-clean.csv") {
   district_counts <- load_district_counts(data_path)
 
@@ -62,6 +98,7 @@ generate_plots <- function(data_path = "pharmacies-all-clean.csv") {
     )
 
   plots[["period_change_plot"]] <- gen_period_change_plot(period_change)
+  plots[["period_change_map"]] <- gen_period_change_map(period_change)
 
   iwalk(
     plots,
