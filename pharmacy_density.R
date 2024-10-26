@@ -34,13 +34,19 @@ gen_counts_by_time_plot <- function(district_counts) {
       color = "District"
     ) +
     theme_minimal() +
-    theme(legend.position = "bottom")
+    theme(
+      legend.position = "bottom",
+      plot.background = element_rect(color = "white")
+    )
 }
 
 gen_period_change_plot <- function(period_change) {
   ggplot(
     period_change,
-    aes(x = district, y = relative_change, fill = relative_change)
+    aes(
+      x = reorder(district, relative_change),
+      y = relative_change, fill = relative_change
+    )
   ) +
     geom_col() +
     scale_fill_viridis_c(option = "rocket") +
@@ -50,8 +56,10 @@ gen_period_change_plot <- function(period_change) {
     ) +
     theme_minimal() +
     theme(
+      axis.text.x = element_text(angle = -80, hjust = 0),
       legend.position = "none",
-      axis.text.x = element_text(angle = 50, hjust = 1)
+      panel.grid = element_blank(),
+      plot.background = element_rect(color = "white")
     )
 }
 
@@ -77,9 +85,16 @@ gen_period_change_map <- function(period_change) {
     ) +
     scale_fill_viridis_c(option = "rocket") +
     labs(
-      fill = "Relative Change"
+      title = "Change in number of pharmacies in Berlin",
+      subtitle = "Per district, 2014 - 2023",
+      fill = ""
     ) +
-    theme_minimal()
+    theme_minimal() +
+    theme(
+      panel.grid = element_blank(),
+      axis.text = element_blank(),
+      plot.background = element_rect(color = "white")
+    )
 }
 
 generate_plots <- function(data_path = "pharmacies-all-clean.csv") {
