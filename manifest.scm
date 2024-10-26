@@ -10,4 +10,6 @@
         "r-magrittr"
         "r-purrr"
         "r-readr"
-        "r-tidyr"))
+        "r-terra"
+        "r-tidyr"
+        "r-tidyterra"))
