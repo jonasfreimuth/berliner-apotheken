@@ -103,7 +103,7 @@ generate_plots <- function(data_path = "pharmacies-all-clean.csv") {
   iwalk(
     plots,
     \(plot, name) {
-      ggsave(plot = plot, filename = paste0(name, ".pdf"), width = 9)
+      ggsave(plot = plot, filename = paste0(name, ".png"), width = 9)
     }
   )
 }
